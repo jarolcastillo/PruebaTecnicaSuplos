@@ -5,7 +5,7 @@ Versión de php en el que se realizó 8.1.4
 Base de datos Mysql
 
 Funcionamiento:
-En el apartado de bienes disponibles podemos ver el listado de todos los bienes tal cual se solicitó, al lado izquierdo con un filto perfectamente funcional en los 3 campos, filtra tanto por ciudad, como por tipo, como por precio en bienes disponibles y en mis bienes, al filtrar aparece un botón que nos permite regresar a todos los bienes, permite guardar y eliminar bienes en tiempo real, aparte de esto nos permite descargar un reporte en formato excel que nos muestra todos los bienes tanto disponibles como en mis bienes permitiendo filtralos.
+En el apartado de bienes disponibles podemos ver el listado de todos los bienes tal cual se solicitó, al lado izquierdo con un filtro perfectamente funcional en los 3 campos, filtra tanto por ciudad, como por tipo, como por precio en bienes disponibles y en mis bienes, al filtrar aparece un botón que nos permite regresar a todos los bienes, permite guardar y eliminar bienes en tiempo real, aparte de esto nos permite descargar un reporte en formato Excel que nos muestra todos los bienes tanto disponibles como en mis bienes permitiendo filtrarlos.
 
 Proceso para compilar:
 1.Descargamos e instalamos xampp.
@@ -22,6 +22,7 @@ Se creó una base de datos con el nombre "intelcost_bienes" y una tabla en su in
 El archivo para importar se encuentra en la carpeta Bd.
 
 Descarga de Excel:
-se utilizo la libreria PhpSpreadsheet para generar el archivo excel descargable.
-Al generar el archivo excel se muestra un vinculo en la parte inferior del boton Generar excel par poder descargar el excel generado.
+se utilizó la librería PhpSpreadsheet para generar el archivo Excel descargable.
+Al generar el archivo Excel se muestra un vínculo en la parte inferior del botón Generar Excel para poder descargar el Excel generado.
+
 

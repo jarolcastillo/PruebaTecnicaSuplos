@@ -36,7 +36,7 @@
             <p><label for="selecTipo">Tipo:</label></p>
             <br>
             <select name="tipo" id="selectTipo">
-              <option value="">Elige un tipo</option>
+              <option value="" selected>Elige un tipo</option>
             </select>
           </div>
           <div class="filtroPrecio">
@@ -45,6 +45,7 @@
           </div>
           <div class="botonField">
             <input type="submit" class="btn white" value="Buscar" id="submitButton">
+            <button type="button" id="view_all" class="btn" style="margin-top: 5px;">Mostrar Todos</button>
           </div>
         </div>
       </form>
@@ -53,21 +54,67 @@
       <ul>
         <li><a href="#tabs-1">Bienes disponibles</a></li>
         <li><a href="#tabs-2">Mis bienes</a></li>
+        <li><a href="#tabs-3">Reportes</a></li>
       </ul>
       <div id="tabs-1">
-        <div class="colContenido" id="divResultadosBusqueda">
+        <div class="colContenido">
           <div class="tituloContenido card" style="justify-content: center;">
-            <h5>Resultados de la búsqueda:</h5>
+            <h5>Bienes disponibles:</h5>
             <div class="divider"></div>
+            <div id="divResultadosBusqueda"></div>
           </div>
         </div>
       </div>
       
       <div id="tabs-2" >
-        <div class="colContenido" id="divResultadosBusqueda">
+        <div class="colContenido">
           <div class="tituloContenido card" style="justify-content: center;">
             <h5>Bienes guardados:</h5>
             <div class="divider"></div>
+            <div id="divResultadosBusqueda2"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="tabs-3" >
+        <div class="colContenido" id="divResultadosBusqueda3">
+          <div class="tituloContenido card" style="justify-content: center;">
+            <h5>Exportar reporte:</h5>
+            <div class="divider"></div>
+            <form action="#" method="post" id="formulario2">
+              <div class="filtrosContenido">
+                <div class="tituloFiltros">
+                  <h5>Filtros</h5>
+                </div>
+                <div class="filtroCiudad input-field">
+                  <p><label for="selectCiudad2">Ciudad:</label><br></p>
+                  <select name="ciudad" id="selectCiudad2">
+                    <option value="" selected>Elige una ciudad</option>
+                  </select>
+                </div>
+                <div class="filtroTipo input-field">
+                  <p><label for="selecTipo2">Tipo:</label></p>
+                  <br>
+                  <select name="tipo" id="selectTipo2">
+                    <option value="" selected>Elige un tipo</option>
+                  </select>
+                </div>
+                <div class="filtroTipo input-field">
+                  <p><label for="selecReporte2">Tipo:</label></p>
+                  <br>
+                  <select name="reporte" id="selecReporte2" required>
+                    <option value="" selected disabled>Elige de donde quieres el reporte</option>
+                    <option value="disponibles">Bienes disponibles</option>
+                    <option value="Mis bienes">Mis bienes</option>
+                  </select>
+                </div>
+                <div class="botonField">
+                  <input type="submit" class="btn white" value="Generar EXEL" id="submitButton2"style="margin-bottom: 30px;">
+                  <br>
+                  <a href="php/Reporte.xlsx" download="reporte" id="download_re" style="color: blue;text-decoration: revert;"> Descargar excel aquí!!!</a>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -84,6 +131,147 @@
     <script type="text/javascript">
       $( document ).ready(function() {
           $( "#tabs" ).tabs();
+
+          //------------ ajax inicial para traer todos los bienes disponibles
+          $.ajax({
+            type: 'POST',
+            url: 'php/functions.php',
+            data:{
+              'type': 'get_available_goods'
+            },
+            dataType: "json",
+            success: function(data){
+              if(data.response == 'correct'){
+                $('#divResultadosBusqueda').html(data.info);
+                $('#divResultadosBusqueda2').html(data.info2);
+                $('#selectCiudad').html(data.info_citys);
+                $('#selectTipo').html(data.info_types);
+                $('#selectCiudad2').html(data.info_citys);
+                $('#selectTipo2').html(data.info_types);
+              }
+            },
+            error: function(data){
+              console.log('Error encontrando Bienes disponibles');
+            }
+          });
+
+          //------------ funcion que se ejecuta en el boton de buscar
+          $('#formulario').off('submit');
+          $('#formulario').on('submit', function(e){
+              e.preventDefault();
+
+              var btnSearch = $('#submitButton');
+
+              var params = $(this).serializeArray();
+              var formData = new FormData(this);
+
+              formData.append('type', 'filter_available_goods');
+
+              $(params).each(function(index, element){
+                formData.append(element.name, element.value);
+              });
+
+              $.ajax({
+                type: 'POST',
+                url: 'php/functions.php',
+                data: formData,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                beforeSend: function(){
+                  btnSearch.attr('value', 'Filtrando');
+                  btnSearch.attr('disabled', 'disabled');
+                },
+                complete: function(){
+                  btnSearch.attr('value', 'Buscar');
+                  btnSearch.removeAttr('disabled');
+                },
+                success: function(data){
+                  if(data.response == 'correct'){
+                    $('#divResultadosBusqueda').html(data.info);
+                    $('#divResultadosBusqueda2').html(data.info2);
+                    $('#view_all').show();
+                  }
+                },
+                error: function(data){
+                  console.log('Error filtrando Bienes disponibles');
+                }
+              });
+              return false;
+          });
+
+          //------------ funcion que se ejecuta en el boton de Mostrar Todos
+          $('#view_all').hide();
+          $('#view_all').off('click');
+          $('#view_all').on('click', function(){
+            $.ajax({
+              type: 'POST',
+              url: 'php/functions.php',
+              data:{
+                'type': 'get_available_goods'
+              },
+              dataType: "json",
+              success: function(data){
+                if(data.response == 'correct'){
+                  $('#divResultadosBusqueda').html(data.info);
+                  $('#divResultadosBusqueda2').html(data.info2);
+                  $('#selectCiudad').html(data.info_citys);
+                  $('#selectTipo').html(data.info_types);
+                  $('#view_all').hide();
+                }
+              },
+              error: function(data){
+                console.log('Error encontrando Bienes disponibles');
+              }
+            });
+          });
+          
+          //------------ funcion que se ejecuta en el boton Descargar EXEL
+          $('#download_re').hide();
+          $('#formulario2').off('submit');
+          $('#formulario2').on('submit', function(e){
+              e.preventDefault();
+
+              var btnSearch = $('#submitButton2');
+
+              var params = $(this).serializeArray();
+              var formData = new FormData(this);
+
+              formData.append('type', 'download_exel');
+
+              $(params).each(function(index, element){
+                formData.append(element.name, element.value);
+              });
+
+              $.ajax({
+                type: 'POST',
+                url: 'php/functions.php',
+                data: formData,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                beforeSend: function(){
+                  btnSearch.attr('value', 'Generando');
+                  btnSearch.attr('disabled', 'disabled');
+                },
+                complete: function(){
+                  btnSearch.attr('value', 'Generar EXEL');
+                  btnSearch.removeAttr('disabled');
+                },
+                success: function(data){
+                  $('#download_re').show();
+                },
+                error: function(data){
+                  console.log('Error generando excel');
+                }
+              });
+              return false;
+          });
+
+          $('#download_re').on('click', function(){
+            $('#download_re').hide();
+          });
+          
       });
     </script>
   </body>
